@@ -1,21 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Bot, User } from 'lucide-react';
+import { Loader2, Send } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import Header from "./Header";
 
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
   isStreaming?: boolean;
 }
 
 export default function InfoSection() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSend = async () => {
@@ -23,16 +24,16 @@ export default function InfoSection() {
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue.trim(),
-      sender: 'user',
+      sender: "user",
     };
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
+    setInputValue("");
     setIsLoading(true);
 
     const botMessageId = (Date.now() + 1).toString();
     setMessages((prev) => [
       ...prev,
-      { id: botMessageId, text: '', sender: 'bot', isStreaming: true },
+      { id: botMessageId, text: "", sender: "bot", isStreaming: true },
     ]);
 
     try {
@@ -41,7 +42,7 @@ export default function InfoSection() {
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === botMessageId
-            ? { ...msg, text: 'Sorry, there was an error.', isStreaming: false }
+            ? { ...msg, text: "Sorry, there was an error.", isStreaming: false }
             : msg
         )
       );
@@ -52,15 +53,15 @@ export default function InfoSection() {
 
   const streamResponse = async (userInput: string, messageId: string) => {
     // Replace '/api/chat' with your real endpoint
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: userInput }),
     });
-    if (!response.ok) throw new Error('Network error');
+    if (!response.ok) throw new Error("Network error");
     const reader = response.body?.getReader();
-    if (!reader) throw new Error('No stream');
-    let accumulated = '';
+    if (!reader) throw new Error("No stream");
+    let accumulated = "";
     const decoder = new TextDecoder();
     try {
       while (true) {
@@ -85,18 +86,22 @@ export default function InfoSection() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleSend();
     }
   };
 
   return (
-    <section className='flex flex-col justify-end pb-4 min-h-[45rem] bg-[#0C0E16] px-4 lg:px-16 md:px-8 '>
-      <div className='w-full bg-[#181A20] rounded-2xl shadow-xl flex flex-col h-[34rem] '>
-        <div className='flex-1 overflow-y-auto px-6 py-4 space-y-6'>
+    <section className="flex flex-col justify-end pb-4 min-h-[calc(100vh-20rem)] bg-[#0C0E16]  ">
+      <div className="text-white p-5 mb-5 border-b border-gray-100">
+        <Header />
+      </div>
+
+      <div className="w-full  rounded-2xl shadow-xl flex flex-col h-[34rem] ">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           {messages.length === 0 && (
-            <div className='text-center text-gray-500 mt-16 h-56 flex items-center justify-center'>
+            <div className="text-center text-gray-500 mt-16 h-56 flex items-center justify-center">
               No messages yet. Start the conversation!
             </div>
           )}
@@ -104,14 +109,14 @@ export default function InfoSection() {
             <div
               key={msg.id}
               className={`flex ${
-                msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                msg.sender === "user" ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={` md:max-w-[80%] rounded-xl px-4 py-3 text-base shadow ${
-                  msg.sender === 'user'
-                    ? 'bg-blue-600 text-white [border-radius:16px_6px_16px_16px]'
-                    : 'bg-[#23242a] text-gray-100 border border-[#23242a] [border-radius:6px_16px_16px_16px]'
+                  msg.sender === "user"
+                    ? "bg-blue-600 text-white [border-radius:16px_6px_16px_16px]"
+                    : "bg-[#23242a] text-gray-100 border border-[#23242a] [border-radius:6px_16px_16px_16px]"
                 }`}
               >
                 {/* <div className='flex items-center gap-2 mb-1 cta'>
@@ -125,10 +130,10 @@ export default function InfoSection() {
                     {msg.sender === 'user' ? 'You' : 'AskUoK AI'}
                   </span>
                 </div> */}
-                <div className='whitespace-pre-line'>
+                <div className="whitespace-pre-line">
                   {msg.text}
                   {msg.isStreaming && (
-                    <span className='inline-block w-2 h-4 bg-blue-400 ml-1 animate-pulse align-middle'></span>
+                    <span className="inline-block w-2 h-4 bg-blue-400 ml-1 animate-pulse align-middle"></span>
                   )}
                 </div>
               </div>
@@ -137,16 +142,16 @@ export default function InfoSection() {
           <div ref={messagesEndRef} />
         </div>
         <form
-          className='p-4 border-t border-[#23242a] bg-[#181A20] flex gap-2'
+          className="border-t border-[#23242a] bg-[#181A20] flex gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
           }}
         >
           <input
-            type='text'
-            className='w-full rounded-lg px-4 py-2 bg-[#23242a] text-white border border-[#23242a] focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Ask anything...'
+            type="text"
+            className="w-full rounded-lg px-4 py-2 bg-[#23242a] text-white border border-[#23242a] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ask anything..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -154,14 +159,14 @@ export default function InfoSection() {
             autoFocus
           />
           <button
-            type='submit'
-            className='bg-blue-600 hover:bg-blue-700 cta text-white px-3 py-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed'
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 cta text-white px-3 py-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!inputValue.trim() || isLoading}
           >
             {isLoading ? (
-              <Loader2 className='w-5 h-5 animate-spin' />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Send className='w-5 h-5 text-white ' />
+              <Send className="w-5 h-5 text-white " />
             )}
           </button>
         </form>

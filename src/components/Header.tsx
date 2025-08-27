@@ -1,20 +1,19 @@
+import { ROUTES } from "@/lib/routes";
+import tokenManager from "@/lib/tokenManager";
+import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
+
 export default function Header() {
+  const token = tokenManager.getToken();
   return (
-    <header>
-      <div className='logo'>AskUoK </div>
-      <nav>
-        <ul>
-          <li>
-            <a href='#link1'>About camp</a>
-          </li>
-          <li>
-            <a href='#link2'>Events</a>
-          </li>
-          <li>
-            <a href='#link3'>Sign in</a>
-          </li>
-        </ul>
-      </nav>
+    <header className="flex justify-between">
+      <div className="logo">AskUoK </div>
+      <Link
+        to={token ? ROUTES.HOME : ROUTES.LOGIN}
+        onClick={() => token && tokenManager.logout()}
+      >
+        <Button variant="primary">{token ? "Logout" : "Login"}</Button>
+      </Link>
     </header>
   );
 }
