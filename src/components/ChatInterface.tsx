@@ -93,12 +93,12 @@ export default function InfoSection() {
   };
 
   return (
-    <section className="flex flex-col justify-end pb-4 min-h-[calc(100vh-20rem)] bg-[#0C0E16]  ">
+    <section className="flex flex-col justify-end pb-4 min-h-[calc(100vhrem)] bg-[#0C0E16]  ">
       <div className="text-white p-5 mb-5 border-b border-gray-100">
         <Header />
       </div>
 
-      <div className="w-full  rounded-2xl shadow-xl flex flex-col h-[34rem] ">
+      <div className="w-full rounded-2xl shadow-xl flex flex-col h-[34rem] ">
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-16 h-56 flex items-center justify-center">

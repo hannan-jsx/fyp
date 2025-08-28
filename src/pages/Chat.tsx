@@ -1,11 +1,7 @@
-import InfoSection from "@/components/InfoSection";
+import ChatInterface from "@/components/ChatInterface";
 
 const Chat = () => {
-  return (
-    <div>
-      <InfoSection />
-    </div>
-  );
+  return <ChatInterface />;
 };
 
 export default Chat;
