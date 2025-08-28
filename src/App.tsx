@@ -1,8 +1,8 @@
-import { Route, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { ROUTES } from "./lib/routes";
+import { Route, Routes } from "react-router-dom";
 import Loader from "./components/Loader";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import { ROUTES } from "./lib/routes";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -24,17 +24,17 @@ function App() {
         <Route
           path={ROUTES.CHAT}
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["student", "admin"]}>
               <Chat />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route
           path={ROUTES.ADMIN}
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["admin"]}>
               <AdminPanel />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route path="*" element={<Home />} />

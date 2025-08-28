@@ -23,9 +23,15 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already authenticated
     if (tokenManager.isAuthenticated()) {
-      navigate("/chat");
+      const user = tokenManager.getUser();
+      if (user) {
+        if (user.role === "student") {
+          navigate(ROUTES.CHAT);
+        } else if (user.role === "admin") {
+          navigate(ROUTES.ADMIN);
+        }
+      }
     }
   }, [navigate]);
 
@@ -34,12 +40,9 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // For demo purposes, simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (email && password) {
-        // Simulate successful login
         const mockUser = {
           id: "user123",
           email: email,
@@ -49,11 +52,7 @@ const Login = () => {
         };
 
         const mockToken = "mock-jwt-token-" + Date.now();
-
-        // Use token manager to set authentication
         tokenManager.setAuth(mockToken, mockUser, 24);
-
-        // Navigate to chat
         navigate("/chat");
       }
     } catch (error) {
@@ -134,7 +133,7 @@ const Login = () => {
                 {isLoading ? "Signing in..." : "Sign In as Admin"}
               </Button>
 
-              <button
+              {/* <button
                 type="button"
                 className="px-6 py-2.5 bg-gray-800 text-white border-none rounded-full text-sm cursor-pointer whitespace-nowrap flex justify-center w-full items-center gap-2  "
               >
@@ -159,7 +158,7 @@ const Login = () => {
                   </svg>
                 </div>
                 Sign in with Google as Student
-              </button>
+              </button> */}
             </form>
 
             <Link

@@ -1,71 +1,61 @@
-// Token Manager - Handles all localStorage operations for authentication
-
 import { ROUTES } from "./routes";
+export type UserRole = "student" | "admin";
 
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  role?: "student" | "admin" | "faculty";
-  department?: string;
+  username?: string;
+  role: UserRole;
 }
 
 export interface AuthData {
-  token: string;
+  token: {
+    access: string;
+    refresh: string;
+  };
   user: User;
-  expiresAt: number;
+  new_user: boolean;
 }
-
 class TokenManager {
   private readonly TOKEN_KEY = "token";
   private readonly USER_KEY = "user";
   private readonly AUTH_STATUS_KEY = "isAuthenticated";
   private readonly EXPIRES_AT_KEY = "expiresAt";
 
-  // Check if user is authenticated
-  isAuthenticated(): boolean {
+  public isAuthenticated(): boolean {
     const token = this.getToken();
     const expiresAt = this.getExpiresAt();
 
-    if (!token || !expiresAt) {
-      return false;
-    }
+    if (!token || !expiresAt) return false;
 
-    // Check if token has expired
     if (Date.now() > expiresAt) {
       this.clearAuth();
       return false;
     }
-
     return true;
   }
-
-  // Get authentication token
-  getToken(): string | null {
+  public getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Get user data
-  getUser(): User | null {
+  public getUser(): User | null {
     const userStr = localStorage.getItem(this.USER_KEY);
     if (!userStr) return null;
 
     try {
-      return JSON.parse(userStr);
+      return JSON.parse(userStr) as User;
     } catch (error) {
       console.error("Error parsing user data:", error);
       return null;
     }
   }
 
-  // Get token expiration time
-  getExpiresAt(): number | null {
+  public getExpiresAt(): number | null {
     const expiresAt = localStorage.getItem(this.EXPIRES_AT_KEY);
     return expiresAt ? parseInt(expiresAt, 10) : null;
   }
 
-  // Set authentication data
-  setAuth(token: string, user: User, expiresInHours: number = 24): void {
+  public setAuth(token: string, user: User, expiresInHours: number = 24): void {
     const expiresAt = Date.now() + expiresInHours * 60 * 60 * 1000;
 
     localStorage.setItem(this.TOKEN_KEY, token);
@@ -74,89 +64,60 @@ class TokenManager {
     localStorage.setItem(this.EXPIRES_AT_KEY, expiresAt.toString());
   }
 
-  // Update user data
-  updateUser(user: Partial<User>): void {
+  public updateUser(user: Partial<User>): void {
     const currentUser = this.getUser();
     if (currentUser) {
-      const updatedUser = { ...currentUser, ...user };
+      const updatedUser: User = { ...currentUser, ...user };
       localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
     }
   }
 
-  // Clear all authentication data
-  clearAuth(): void {
+  public clearAuth(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.AUTH_STATUS_KEY);
     localStorage.removeItem(this.EXPIRES_AT_KEY);
   }
 
-  // Refresh token (if needed)
-  refreshToken(newToken: string, expiresInHours: number = 24): void {
+  public refreshToken(newToken: string, expiresInHours: number = 24): void {
     const user = this.getUser();
     if (user) {
       this.setAuth(newToken, user, expiresInHours);
     }
   }
 
-  // Get user email (for backward compatibility)
-  getUserEmail(): string | null {
-    const user = this.getUser();
-    return user?.email || null;
+  public getUserEmail(): string | null {
+    return this.getUser()?.email || null;
   }
 
-  // Check if user has specific role
-  hasRole(role: User["role"]): boolean {
-    const user = this.getUser();
-    return user?.role === role;
+  public hasRole(role: UserRole): boolean {
+    return this.getUser()?.role === role;
   }
 
-  // Check if user is admin
-  isAdmin(): boolean {
+  public isAdmin(): boolean {
     return this.hasRole("admin");
   }
 
-  // Check if user is student
-  isStudent(): boolean {
+  public isStudent(): boolean {
     return this.hasRole("student");
   }
-
-  // Check if user is faculty
-  isFaculty(): boolean {
-    return this.hasRole("faculty");
-  }
-
-  // Get user department
-  getUserDepartment(): string | null {
-    const user = this.getUser();
-    return user?.department || null;
-  }
-
-  // Get all auth data
-  getAuthData(): AuthData | null {
+  public getAuthData(): AuthData | null {
     const token = this.getToken();
     const user = this.getUser();
-    const expiresAt = this.getExpiresAt();
 
-    if (!token || !user || !expiresAt) {
-      return null;
-    }
+    if (!token || !user) return null;
 
     return {
-      token,
+      token: { access: token, refresh: token },
       user,
-      expiresAt,
+      new_user: false,
     };
   }
-
-  // Set auth data from complete object
-  setAuthData(authData: AuthData): void {
-    const expiresInHours = (authData.expiresAt - Date.now()) / (60 * 60 * 1000);
-    this.setAuth(authData.token, authData.user, expiresInHours);
+  public setAuthData(authData: AuthData): void {
+    this.setAuth(authData.token.access, authData.user, 24);
   }
 
-  // Check if token will expire soon (within specified minutes)
-  isTokenExpiringSoon(minutes: number = 30): boolean {
+  public isTokenExpiringSoon(minutes: number = 30): boolean {
     const expiresAt = this.getExpiresAt();
     if (!expiresAt) return true;
 
@@ -164,38 +125,28 @@ class TokenManager {
     return expiresAt <= expirationThreshold;
   }
 
-  // Get remaining token validity time in milliseconds
-  getTokenValidityTime(): number {
+  public getTokenValidityTime(): number {
     const expiresAt = this.getExpiresAt();
-    if (!expiresAt) return 0;
-
-    return Math.max(0, expiresAt - Date.now());
+    return expiresAt ? Math.max(0, expiresAt - Date.now()) : 0;
   }
 
-  // Get remaining token validity time in hours
-  getTokenValidityHours(): number {
+  public getTokenValidityHours(): number {
     return this.getTokenValidityTime() / (60 * 60 * 1000);
   }
 
-  // Logout user
-  logout(): void {
+  public logout(redirect: string = ROUTES.HOME): void {
     this.clearAuth();
-    // Redirect to login page
-    window.location.href = ROUTES.HOME;
+    window.location.href = redirect;
   }
 
-  // Initialize auth state (for app startup)
-  initializeAuth(): boolean {
+  public initializeAuth(): boolean {
     return this.isAuthenticated();
   }
 }
 
-// Create and export a singleton instance
 const tokenManager = new TokenManager();
-
 export default tokenManager;
 
-// Export individual functions for convenience
 export const {
   isAuthenticated,
   getToken,
@@ -209,8 +160,6 @@ export const {
   hasRole,
   isAdmin,
   isStudent,
-  isFaculty,
-  getUserDepartment,
   getAuthData,
   setAuthData,
   isTokenExpiringSoon,
