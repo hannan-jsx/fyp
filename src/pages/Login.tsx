@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLogin } from "@/hooks/useLogin";
 import { ROUTES } from "@/lib/routes";
 import tokenManager from "@/lib/tokenManager";
 import { Eye, EyeOff } from "lucide-react";
@@ -29,6 +30,7 @@ const Login = () => {
         if (user.role === "student") {
           navigate(ROUTES.CHAT);
         } else if (user.role === "admin") {
+          // Admins can access both chat and admin, default to admin panel
           navigate(ROUTES.ADMIN);
         }
       }
@@ -40,21 +42,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (email && password) {
-        const mockUser = {
-          id: "user123",
-          email: email,
-          name: "Demo User",
-          role: "student" as const,
-          department: "Computer Science",
-        };
-
-        const mockToken = "mock-jwt-token-" + Date.now();
-        tokenManager.setAuth(mockToken, mockUser, 24);
-        navigate("/chat");
-      }
+      await useLogin({ email, password });
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -171,7 +159,7 @@ const Login = () => {
             <div className="mt-4 pt-4 border-t border-[#23242a]">
               <div className="text-center">
                 <p className="text-gray-400 text-xs">
-                  Powered by University of Karachi Student Community
+                  Powered by the UBIT Student
                 </p>
               </div>
             </div>

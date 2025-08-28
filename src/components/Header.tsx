@@ -29,11 +29,18 @@ export default function Header() {
               </Link>
             )}
             {user.role === "admin" && (
-              <Link to={ROUTES.ADMIN}>
-                <Button variant="outline" size="sm">
-                  Admin Panel
-                </Button>
-              </Link>
+              <>
+                <Link to={ROUTES.CHAT}>
+                  <Button variant="outline" size="sm">
+                    Chat
+                  </Button>
+                </Link>
+                <Link to={ROUTES.ADMIN}>
+                  <Button variant="outline" size="sm">
+                    Admin Panel
+                  </Button>
+                </Link>
+              </>
             )}
             <Button
               variant="destructive"

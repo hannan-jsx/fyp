@@ -25,12 +25,9 @@ export default function HeroSection() {
       </div>
       <div className="reserve-btn-container">
         <center>
-          <p className="price">
-            Powered by the University of Karachi Student Community
-          </p>
+          <p className="price">Powered by the UBIT Student</p>
         </center>
       </div>
-      {/* <ScrollDownArrow /> */}
     </div>
   );
 }

@@ -29,7 +29,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <section className="flex flex-col justify-end min-h-screen bg-[#0C0E16]">
+    <section className="flex flex-col justify-between min-h-screen bg-[#0C0E16]">
       <div className="text-white p-5 mb-5 border-b border-gray-100">
         <Header />
       </div>

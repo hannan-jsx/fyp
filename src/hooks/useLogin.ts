@@ -1,4 +1,4 @@
-import { loginWithGoogle } from "@/api/auth";
+import { loginAsAdmin, loginWithGoogle } from "@/api/auth";
 import { ROUTES } from "@/lib/routes";
 import tokenManager from "@/lib/tokenManager";
 import toast from "react-hot-toast";
@@ -27,4 +27,23 @@ export const handleGoogleSuccess = async (credentialResponse: any) => {
 
 export const handleGoogleFailure = () => {
   toast.error("Google sign-in failed");
+};
+
+export const useLogin = async (param: { email: string; password: string }) => {
+  try {
+    const response = await loginAsAdmin(param);
+
+    // Set authentication data
+    tokenManager.setAuthData(response.data);
+
+    // Navigate to admin panel
+    window.location.href = ROUTES.ADMIN;
+
+    toast.success("Admin login successful!");
+  } catch (error: any) {
+    console.error("Admin login error:", error);
+    toast.error(
+      error.response?.data?.error || "Admin sign-in failed. Please try again."
+    );
+  }
 };

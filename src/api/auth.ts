@@ -16,3 +16,16 @@ export const loginWithGoogle = async (token: string): Promise<AuthResponse> => {
     throw error;
   }
 };
+
+export const loginAsAdmin = async (param: {
+  email: string;
+  password: string;
+}): Promise<AuthResponse> => {
+  try {
+    const response = await apiClient.post("api/user/login/", param);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
