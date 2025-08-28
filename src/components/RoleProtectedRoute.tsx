@@ -15,22 +15,15 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
 }) => {
   const isAuthenticated = tokenManager.isAuthenticated();
   const user = tokenManager.getUser();
-
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
-
-  // If no user data, redirect to login
   if (!user) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
-
-  // Check if user has the required role
   const hasRequiredRole = allowedRoles.includes(user.role);
 
   if (!hasRequiredRole) {
-    // Role-based fallback routing
     if (user.role === "student") {
       return <Navigate to={ROUTES.CHAT} replace />;
     } else if (user.role === "admin") {

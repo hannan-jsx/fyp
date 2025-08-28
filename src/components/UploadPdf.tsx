@@ -13,10 +13,17 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ onUpload, file }) => {
 
   const handleFileSelect = (file: File) => {
     const maxSize = 10 * 1024 * 1024;
+
+    if (!file.name.toLowerCase().endsWith(".json")) {
+      toast.error("Only JSON files are allowed");
+      return;
+    }
+
     if (file.size > maxSize) {
       toast.error("File size must be less than 10MB");
       return;
     }
+
     onUpload && onUpload(file);
   };
 
@@ -47,50 +54,50 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ onUpload, file }) => {
   };
 
   return (
-    <div className="flex cta  text-white items-center justify-center flex-col gap-6 w-full">
+    <div className="flex cta text-white items-center justify-center flex-col gap-6 w-full">
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`border-2  gap-4 sm:justify-between flex-wrap sm:flex-nowrap items-center border-dashed rounded-md w-full p-36  text-center transition-all duration-200 ${
+        className={`border-2 gap-4 sm:justify-between flex-wrap sm:flex-nowrap items-center border-dashed rounded-md w-full p-36 text-center transition-all duration-200 ${
           isDragOver
-            ? "border-success-500 bg-green-100"
+            ? "bg-green-500/20 backdrop-blur-md border border-green-500/30"
             : file
-            ? "border-primary-300 bg-blue-50"
+            ? "bg-blue-100/10 backdrop-blur-sm border border-white/20"
             : "border-warning-150"
         }`}
       >
-        <div className="   gap-4">
+        <div className="gap-4">
           <div className="flex m-auto justify-center">
             <CloudUpload className="w-10 h-10 " />
           </div>
 
           {file ? (
-            <div className="flex text-center flex-col">
+            <div className="flex text-center gap-2 flex-col">
               <p className="text-lg font-semibold text-primary-300 whitespace-pre-line">
-                File Selected: {shrinkText(file.name, 15)}
+                File Selected: {shrinkText(file.name, 20)}
               </p>
-              <p className="text-sm text-primary-300">
+              <p className="text-sm pb-1 text-primary-300">
                 Size: {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>
           ) : (
-            <div className="text-center mx-auto  sm:max-w-60 ">
-              <p className="text-xs text-neutral-500">
-                Supported formats: PDF, JPG, PNG | Max size: 10MB
+            <div className="text-center mx-auto gap-2 sm:max-w-72 ">
+              <p className="text-sm font-semibold text-primary-300 whitespace-pre-line">
+                Supported formats: JSON | Max size: 10MB
               </p>
-              <p className="text-xs font-semibold text-black">
-                Drag and Drop an image here or
+              <p className="text-sm pb-1 text-primary-300">
+                Drag and Drop a JSON file here or
               </p>
             </div>
           )}
         </div>
-        <div className="">
+        <div>
           <input
             type="file"
             id="file-input"
             className="hidden"
-            accept=".pdf,.jpg,.jpeg,.png"
+            accept=".json"
             onChange={handleFileInputChange}
           />
           <label

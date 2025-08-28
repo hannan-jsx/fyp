@@ -16,7 +16,6 @@ const Home = () => {
         if (user.role === "student") {
           navigate(ROUTES.CHAT);
         } else if (user.role === "admin") {
-          // Admins can access both chat and admin, default to admin panel
           navigate(ROUTES.ADMIN);
         }
       }

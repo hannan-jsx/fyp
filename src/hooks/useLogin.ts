@@ -6,12 +6,9 @@ import toast from "react-hot-toast";
 export const handleGoogleSuccess = async (credentialResponse: any) => {
   try {
     const idToken = credentialResponse.credential;
-    console.log({ idToken });
 
     const response = await loginWithGoogle(idToken);
     tokenManager.setAuthData(response.data);
-
-    // Role-based navigation
     const user = response.data.user;
     if (user.role === "student") {
       window.location.href = ROUTES.CHAT;
@@ -32,11 +29,7 @@ export const handleGoogleFailure = () => {
 export const useLogin = async (param: { email: string; password: string }) => {
   try {
     const response = await loginAsAdmin(param);
-
-    // Set authentication data
     tokenManager.setAuthData(response.data);
-
-    // Navigate to admin panel
     window.location.href = ROUTES.ADMIN;
 
     toast.success("Admin login successful!");

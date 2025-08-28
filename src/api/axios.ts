@@ -1,33 +1,21 @@
+import tokenManager from "@/lib/tokenManager";
 import axios, {
+  AxiosError,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
-import tokenManager from "@/lib/tokenManager";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:3000/api",
-  // timeout: 10000,
-  // headers: {
-  //   "Content-Type": "application/json",
-  // },
 });
 
-// Request interceptor
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = tokenManager.getToken();
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-    if (import.meta.env.DEV) {
-      console.log("🚀 API Request:", {
-        method: config.method?.toUpperCase(),
-        url: config.url,
-        data: config.data,
-      });
     }
 
     return config;
@@ -40,14 +28,6 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    if (import.meta.env.DEV) {
-      console.log("✅ API Response:", {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
-
     return response;
   },
   (error: AxiosError) => {
@@ -66,15 +46,12 @@ api.interceptors.response.use(
           window.location.href = "/login";
           break;
         case 403:
-          // Forbidden
           console.error("Access forbidden");
           break;
         case 404:
-          // Not found
           console.error("Resource not found");
           break;
         case 500:
-          // Server error
           console.error("Server error");
           break;
         default:
